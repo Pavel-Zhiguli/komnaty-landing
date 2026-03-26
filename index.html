@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комнаты — Приватный доступ в интернет</title>
+    <meta name="description" content="Приватный сервис для безопасного доступа в интернет. Только по приглашениям.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #111;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+            line-height: 2;
+        }
+
+        /* ===== SCANLINES OVERLAY ===== */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.1) 2px,
+                rgba(0,0,0,0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ===== PIXEL STARS BACKGROUND ===== */
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #FF6B00;
+            opacity: 0;
+            animation: twinkle var(--dur) var(--delay) infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: var(--max-op); }
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            text-align: center;
+            padding: 15px 0 60px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-title {
+            font-size: 36px;
+            color: #FF6B00;
+            text-shadow:
+                4px 4px 0 #000,
+                -2px -2px 0 #000,
+                0 0 20px rgba(255,107,0,0.3);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .hero-title:hover {
+            animation: glitch 0.3s ease-in-out;
+        }
+
+        /* Glitch effect */
+        @keyframes glitch {
+            0%   { transform: translate(0); }
+            10%  { transform: translate(-3px, 2px); filter: hue-rotate(90deg); }
+            20%  { transform: translate(3px, -2px); }
+            30%  { transform: translate(-2px, -3px); filter: hue-rotate(0deg); }
+            40%  { transform: translate(2px, 3px); filter: hue-rotate(-90deg); }
+            50%  { transform: translate(-3px, 1px); }
+            60%  { transform: translate(3px, -1px); filter: hue-rotate(0deg); }
+            70%  { transform: translate(-1px, 3px); }
+            80%  { transform: translate(1px, -3px); filter: hue-rotate(90deg); }
+            90%  { transform: translate(-2px, 2px); filter: hue-rotate(0deg); }
+            100% { transform: translate(0); }
+        }
+
+        /* Typewriter */
+        .typewriter-line {
+            font-size: 13px;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 4px solid #FF6B00;
+            width: 0;
+            opacity: 0;
+        }
+        .typewriter-line.line1 {
+            animation:
+                typeReveal 0s 0.5s forwards,
+                typing1 2s 0.5s steps(30, end) forwards,
+                blink-caret 0.6s step-end infinite;
+        }
+        .typewriter-line.line2 {
+            animation:
+                typeReveal 0s 3s forwards,
+                typing2 1.8s 3s steps(25, end) forwards,
+                blink-caret 0.6s step-end infinite;
+        }
+        .typewriter-line.line3 {
+            animation:
+                typeReveal 0s 5.3s forwards,
+                typing3 1.5s 5.3s steps(21, end) forwards,
+                blink-caret 0.6s step-end infinite;
+        }
+        @keyframes typeReveal { to { opacity: 1; } }
+        @keyframes typing1 { to { width: 30ch; } }
+        @keyframes typing2 { to { width: 25ch; } }
+        @keyframes typing3 { to { width: 21ch; } }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #FF6B00; }
+        }
+
+        /* ===== SOVIET BUILDING ===== */
+        .building-container {
+            margin: 40px auto 20px;
+            width: 220px;
+            position: relative;
+        }
+        .building {
+            position: relative;
+            width: 220px;
+        }
+        /* Antenna */
+        .building-antenna {
+            width: 4px; height: 16px;
+            background: #888;
+            margin: 0 auto;
+        }
+        .building-antenna::before {
+            content: '';
+            display: block;
+            width: 20px; height: 4px;
+            background: #888;
+            position: relative;
+            left: -8px; top: 4px;
+        }
+        /* Roof slab */
+        .building-roof {
+            width: 220px; height: 8px;
+            background: #666;
+            border-top: 4px solid #777;
+        }
+        /* Main wall */
+        .building-wall {
+            background: #7a6a5a;
+            border-left: 4px solid #8a7a6a;
+            border-right: 4px solid #6a5a4a;
+            position: relative;
+        }
+        /* Floor */
+        .building-floor {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 12px 12px;
+            border-bottom: 4px solid #6a5a4a;
+        }
+        .building-floor:last-child {
+            border-bottom: none;
+        }
+        /* Window */
+        .win {
+            width: 100%; aspect-ratio: 1;
+            border: 3px solid #5a4a3a;
+            background: #1a1520;
+            transition: background 1.2s ease, box-shadow 1.2s ease;
+            position: relative;
+        }
+        /* Window cross divider */
+        .win::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            width: 2px; height: 100%;
+            background: #5a4a3a;
+            transform: translateX(-50%);
+        }
+        .win::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0;
+            width: 100%; height: 2px;
+            background: #5a4a3a;
+            transform: translateY(-50%);
+        }
+        .win.lit {
+            background: var(--win-color, #FFD580);
+            box-shadow: 0 0 12px 3px var(--win-glow, rgba(255,213,128,0.5));
+        }
+        /* Door */
+        .building-entrance {
+            display: flex;
+            justify-content: center;
+            padding: 8px 0 0;
+            background: #7a6a5a;
+            border-left: 4px solid #8a7a6a;
+            border-right: 4px solid #6a5a4a;
+        }
+        .building-door {
+            width: 32px; height: 44px;
+            background: #4a3a2a;
+            border: 3px solid #5a4a3a;
+            border-bottom: none;
+            position: relative;
+        }
+        .building-door::before {
+            content: '';
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #FF6B00;
+            border-radius: 50%;
+            right: 5px; top: 50%;
+        }
+        /* Ground */
+        .building-ground {
+            width: 260px; height: 6px;
+            background: #444;
+            margin-left: -20px;
+        }
+
+        /* ===== SECTIONS ===== */
+        section {
+            padding: 60px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #FF6B00;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        p, li {
+            font-size: 10px;
+            line-height: 2.4;
+            color: #ccc;
+        }
+
+        /* ===== PANEL (card) ===== */
+        .panel {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+
+        /* ===== STEPS ===== */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .step-num {
+            font-size: 24px;
+            color: #FF6B00;
+            text-shadow: 3px 3px 0 #000;
+            min-width: 50px;
+            text-align: center;
+        }
+        .step-text {
+            font-size: 10px;
+            line-height: 2.4;
+        }
+        .step-text span {
+            color: #FF6B00;
+        }
+
+        /* ===== MODES GRID ===== */
+        .modes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .mode-card {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 20px;
+            position: relative;
+            text-align: center;
+        }
+        .mode-card::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+        .mode-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .mode-card h3 {
+            font-size: 11px;
+            color: #FF6B00;
+            margin-bottom: 12px;
+        }
+        .mode-card p {
+            font-size: 9px;
+            color: #999;
+        }
+
+        /* ===== DOS CONNECTING ANIMATION ===== */
+        .dos-animation {
+            background: #000;
+            border: 4px solid #333;
+            padding: 20px;
+            margin: 30px 0;
+            font-size: 10px;
+            min-height: 120px;
+        }
+        .dos-line {
+            color: #0f0;
+            opacity: 0;
+            margin-bottom: 8px;
+        }
+        .dos-line.dl1 { animation: dosReveal 0s 7.5s forwards; }
+        .dos-line.dl2 { animation: dosReveal 0s 8.5s forwards; }
+        .dos-line.dl3 { animation: dosReveal 0s 9.5s forwards; }
+        .dos-line.dl4 { animation: dosReveal 0s 10.5s forwards; color: #FF6B00; }
+        .dos-line.dl5 { animation: dosReveal 0s 11.5s forwards; color: #FF6B00; }
+        @keyframes dosReveal { to { opacity: 1; } }
+
+        .dos-progress {
+            display: inline-block;
+            overflow: hidden;
+            width: 0;
+            color: #FF6B00;
+        }
+        .dos-line.dl3 .dos-progress {
+            animation: dosReveal 0s 9.5s forwards, dosBar 1s 9.5s steps(20) forwards;
+        }
+        @keyframes dosBar { to { width: 20ch; } }
+
+        /* ===== BUTTONS ===== */
+        .buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            padding: 16px 24px;
+            border: 4px solid #FF6B00;
+            background: #FF6B00;
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #FF6B00;
+        }
+        .btn:not(:hover):not(:active) {
+            animation: btnPulse 2s ease-in-out infinite;
+        }
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 4px 4px 0 #000, 0 0 0 0 rgba(255,107,0,0.4); }
+            50% { box-shadow: 4px 4px 0 #000, 0 0 20px 4px rgba(255,107,0,0.2); }
+        }
+
+        /* ===== INSERT COIN ===== */
+        .insert-coin {
+            text-align: center;
+            font-size: 10px;
+            color: #FF6B00;
+            margin-top: 40px;
+            animation: coinBlink 1s step-end infinite;
+        }
+        @keyframes coinBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .modal::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+        .modal-title {
+            font-size: 12px;
+            color: #FF6B00;
+            margin-bottom: 24px;
+        }
+        .modal-input {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 4px solid #333;
+            color: #FF6B00;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .modal-input:focus {
+            border-color: #FF6B00;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .modal-buttons .btn {
+            font-size: 9px;
+            padding: 12px 18px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 8px;
+            color: #555;
+            border-top: 2px solid #222;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 600px) {
+            .hero-title { font-size: 22px; }
+            h2 { font-size: 14px; }
+            .modes { grid-template-columns: 1fr; }
+            .typewriter-line { font-size: 9px; }
+            @keyframes typing1 { to { width: 26ch; } }
+            .buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pixel stars -->
+<div class="stars" id="stars"></div>
+
+<div class="container">
+    <!-- HERO -->
+    <section class="hero visible">
+        <div class="building-container">
+            <div class="building">
+                <div class="building-antenna"></div>
+                <div class="building-roof"></div>
+                <div class="building-wall">
+                    <div class="building-floor" id="floor5"></div>
+                    <div class="building-floor" id="floor4"></div>
+                    <div class="building-floor" id="floor3"></div>
+                    <div class="building-floor" id="floor2"></div>
+                    <div class="building-floor" id="floor1"></div>
+                </div>
+                <div class="building-entrance">
+                    <div class="building-door"></div>
+                </div>
+                <div class="building-ground"></div>
+            </div>
+        </div>
+        <h1 class="hero-title">KOMHАТЫ</h1>
+        <div class="typewriter-line line1">> Приватный доступ в интернет</div>
+        <div class="typewriter-line line2">> Только по приглашениям</div>
+        <div class="typewriter-line line3">> Безопасно. Быстро.</div>
+
+        <div class="dos-animation">
+            <div class="dos-line dl1">C:\KOMNATY> ping secure-network</div>
+            <div class="dos-line dl2">Connecting to private relay...</div>
+            <div class="dos-line dl3">[<span class="dos-progress">####################</span>] 100%</div>
+            <div class="dos-line dl4">CONNECTION ESTABLISHED</div>
+            <div class="dos-line dl5">Welcome to Komnaty. You are safe now.</div>
+        </div>
+    </section>
+
+    <!-- WHAT IS IT -->
+    <section class="fade-section" id="about">
+        <h2>// ЧТО ЭТО?</h2>
+        <div class="panel">
+            <p>
+                Комнаты — это приватный сервис безопасного
+                доступа в интернет. Не публичный, не коммерческий.
+                Небольшое сообщество людей, которые ценят
+                приватность и свободу в сети.
+            </p>
+            <br>
+            <p>
+                Без лимитов на устройства и трафик.
+                Попасть можно только по приглашению от участника.
+                Каждый новый пользователь проходит одобрение.
+            </p>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="fade-section" id="how">
+        <h2>// КАК ПОДКЛЮЧИТЬСЯ</h2>
+        <div class="panel">
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">01</div>
+                    <div class="step-text">
+                        <span>Получи инвайт</span> от друга,
+                        который уже в Комнатах.
+                        Или отправь заявку — мы рассмотрим.
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">02</div>
+                    <div class="step-text">
+                        <span>Скачай клиент</span> — бесплатное
+                        приложение для любого устройства.
+                        iOS, Android, Windows, macOS.
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">03</div>
+                    <div class="step-text">
+                        <span>Подключись</span> — один клик,
+                        и ты внутри. Быстро, стабильно,
+                        без логов.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TWO MODES -->
+    <section class="fade-section" id="modes">
+        <h2>// ДВА РЕЖИМА</h2>
+        <div class="modes">
+            <div class="mode-card">
+                <div class="mode-icon">&#x1F310;</div>
+                <h3>ПОЛНЫЙ ДОСТУП</h3>
+                <p>Весь трафик через защищённый туннель. Для полной приватности в интернете.</p>
+            </div>
+            <div class="mode-card">
+                <div class="mode-icon">&#x2709;&#xFE0F;</div>
+                <h3>ПРОКСИ</h3>
+                <p>Только Telegram. Без установки приложений. Быстрая настройка за 30 секунд.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="fade-section" id="join">
+        <h2>// КАК ПОПАСТЬ</h2>
+        <div class="panel" style="text-align: center;">
+            <p style="margin-bottom: 20px;">
+                Напиши нашему боту или используй
+                инвайт-ссылку от друга
+            </p>
+            <div class="buttons">
+                <a href="https://t.me/KomnatyBot" class="btn" target="_blank" rel="noopener">
+                    TELEGRAM BOT
+                </a>
+                <a href="#" class="btn btn-secondary" id="inviteBtn">
+                    ЕСТЬ ИНВАЙТ
+                </a>
+            </div>
+            <div class="insert-coin">
+                - INSERT COIN TO CONTINUE -
+            </div>
+        </div>
+    </section>
+
+    <!-- INVITE MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-title">ВВЕДИ ИНВАЙТ-КОД</div>
+            <input type="text" class="modal-input" id="inviteInput" placeholder="KOD-XXXXXX" maxlength="30" autocomplete="off" spellcheck="false">
+            <div class="modal-buttons">
+                <button class="btn" id="modalGo">ВОЙТИ</button>
+                <button class="btn btn-secondary" id="modalClose">ОТМЕНА</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>KOMNATY (C) 2026 // ALL RIGHTS RESERVED</p>
+        <p style="margin-top: 8px; color: #333;">PRIVATE SERVICE // NOT FOR PUBLIC DISTRIBUTION</p>
+    </footer>
+</div>
+
+<script>
+    // Generate pixel stars
+    (function() {
+        const container = document.getElementById('stars');
+        const count = 60;
+        for (let i = 0; i < count; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--dur', (3 + Math.random() * 5) + 's');
+            star.style.setProperty('--delay', (Math.random() * 5) + 's');
+            star.style.setProperty('--max-op', (0.2 + Math.random() * 0.5).toFixed(2));
+            if (Math.random() > 0.7) {
+                star.style.width = '6px';
+                star.style.height = '6px';
+            }
+            container.appendChild(star);
+        }
+    })();
+
+    // Building windows with random lights
+    (function() {
+        var colors = [
+            { bg: '#FFD580', glow: 'rgba(255,213,128,0.5)' },
+            { bg: '#FFB347', glow: 'rgba(255,179,71,0.5)' },
+            { bg: '#87CEEB', glow: 'rgba(135,206,235,0.4)' },
+            { bg: '#FF6B00', glow: 'rgba(255,107,0,0.5)' },
+            { bg: '#E8D5A3', glow: 'rgba(232,213,163,0.4)' },
+        ];
+        var windows = [];
+
+        // Generate 5 windows per floor, 5 floors
+        for (var f = 5; f >= 1; f--) {
+            var floor = document.getElementById('floor' + f);
+            for (var w = 0; w < 5; w++) {
+                var win = document.createElement('div');
+                win.className = 'win';
+                floor.appendChild(win);
+                windows.push(win);
+            }
+        }
+
+        function toggleWindow() {
+            var win = windows[Math.floor(Math.random() * windows.length)];
+            var c = colors[Math.floor(Math.random() * colors.length)];
+            if (win.classList.contains('lit')) {
+                win.classList.remove('lit');
+            } else {
+                win.style.setProperty('--win-color', c.bg);
+                win.style.setProperty('--win-glow', c.glow);
+                win.classList.add('lit');
+            }
+        }
+
+        // Light up ~10 windows initially
+        var shuffled = windows.slice().sort(function() { return 0.5 - Math.random(); });
+        for (var i = 0; i < 10; i++) {
+            (function(win) {
+                var c = colors[Math.floor(Math.random() * colors.length)];
+                setTimeout(function() {
+                    win.style.setProperty('--win-color', c.bg);
+                    win.style.setProperty('--win-glow', c.glow);
+                    win.classList.add('lit');
+                }, i * 200);
+            })(shuffled[i]);
+        }
+
+        // Random toggling every 1-3 seconds
+        function scheduleNext() {
+            var delay = 1000 + Math.random() * 2000;
+            setTimeout(function() {
+                toggleWindow();
+                scheduleNext();
+            }, delay);
+        }
+        scheduleNext();
+    })();
+
+    // Fade-in sections on scroll
+    (function() {
+        const sections = document.querySelectorAll('.fade-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+        sections.forEach(s => observer.observe(s));
+    })();
+
+    // Invite modal
+    (function() {
+        const overlay = document.getElementById('modalOverlay');
+        const input = document.getElementById('inviteInput');
+        const INVITE_BASE = 'https://komnaty-invite.pavlikse.workers.dev/';
+
+        document.getElementById('inviteBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            overlay.classList.add('active');
+            input.value = '';
+            input.focus();
+        });
+
+        document.getElementById('modalClose').addEventListener('click', function() {
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) overlay.classList.remove('active');
+        });
+
+        document.getElementById('modalGo').addEventListener('click', go);
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') go();
+        });
+
+        function go() {
+            var code = input.value.trim();
+            if (code) {
+                window.open(INVITE_BASE + encodeURIComponent(code), '_blank');
+                overlay.classList.remove('active');
+            }
+        }
+    })();
+</script>
+
+</body>
+</html>
