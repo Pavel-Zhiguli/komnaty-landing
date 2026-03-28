@@ -384,11 +384,11 @@
             opacity: 0;
             margin-bottom: 8px;
         }
-        .dos-line.dl1 { animation: dosReveal 0s 4.5s forwards; }
-        .dos-line.dl2 { animation: dosReveal 0s 5.2s forwards; }
-        .dos-line.dl3 { animation: dosReveal 0s 5.9s forwards; }
-        .dos-line.dl4 { animation: dosReveal 0s 7s forwards; color: #FF6B00; }
-        .dos-line.dl5 { animation: dosReveal 0s 7.5s forwards; color: #FF6B00; }
+        .dos-line.dl1 { animation: dosReveal 0s 5s forwards; }
+        .dos-line.dl2 { animation: dosReveal 0s 6s forwards; }
+        .dos-line.dl3 { animation: dosReveal 0s 7s forwards; }
+        .dos-line.dl4 { animation: dosReveal 0s 8.5s forwards; color: #FF6B00; }
+        .dos-line.dl5 { animation: dosReveal 0s 9s forwards; color: #FF6B00; }
         @keyframes dosReveal { to { opacity: 1; } }
 
         .dos-progress {
@@ -398,7 +398,7 @@
             color: #FF6B00;
         }
         .dos-line.dl3 .dos-progress {
-            animation: dosReveal 0s 5.9s forwards, dosBar 1s 5.9s steps(20) forwards;
+            animation: dosReveal 0s 7s forwards, dosBar 1.2s 7s steps(20) forwards;
         }
         @keyframes dosBar { to { width: 20ch; } }
 
@@ -494,6 +494,8 @@
         }
         .modal-hint {
             margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
         }
         .modal-hint pre {
             font-family: 'Press Start 2P', monospace;
@@ -506,6 +508,7 @@
             padding: 8px;
             white-space: pre;
             overflow-x: auto;
+            display: inline-block;
         }
         .modal-input {
             font-family: 'Press Start 2P', monospace;
@@ -688,18 +691,18 @@
             <div class="modal-title">ВВЕДИ ИНВАЙТ-КОД</div>
             <div class="modal-hint">
                 <pre>
-  +--------------------------+
-  |  ОТКУДА ВЗЯТЬ КОД?       |
-  +--------------------------+
-  |                          |
-  |  1. Попроси у друга      |
-  |     который уже внутри   |
-  |                          |
-  |  2. Или напиши боту      |
-  |     @KomnatyBot           |
-  |     и отправь заявку     |
-  |                          |
-  +--------------------------+
++----------------------------+
+|   ОТКУДА ВЗЯТЬ КОД?        |
++----------------------------+
+|                            |
+|  1. Попроси у друга        |
+|     который уже внутри     |
+|                            |
+|  2. Или напиши боту        |
+|     @KomnatyBot            |
+|     и отправь заявку       |
+|                            |
++----------------------------+
                 </pre>
             </div>
             <input type="text" class="modal-input" id="inviteInput" placeholder="KOD-XXXXXX" maxlength="30" autocomplete="off" spellcheck="false">
