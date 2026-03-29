@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комнаты — Приглашение</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #111;
+            color: #e0e0e0;
+            image-rendering: pixelated;
+            line-height: 2;
+            min-height: 100vh;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 20px;
+            color: #FF6B00;
+            text-align: center;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 8px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .panel {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+        .panel-green {
+            border-color: #2ea043;
+        }
+        .panel-green .step-label { color: #2ea043; }
+        .step-label {
+            font-size: 10px;
+            color: #FF6B00;
+            margin-bottom: 12px;
+        }
+        p, li {
+            font-size: 9px;
+            line-height: 2.2;
+            color: #ccc;
+        }
+
+        /* Platform links */
+        .platform-links {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .platform-links a {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            padding: 8px 12px;
+            border: 2px solid #FF6B00;
+            background: #1a1a1a;
+            color: #FF6B00;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .platform-links a:hover {
+            background: #FF6B00;
+            color: #000;
+        }
+
+        /* iOS guide */
+        .ios-guide {
+            display: none;
+            background: #111;
+            border: 2px solid #444;
+            padding: 14px;
+            margin-top: 12px;
+        }
+        .ios-guide.visible { display: block; }
+        .ios-guide h3 {
+            font-size: 9px;
+            color: #FF6B00;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .ios-guide ol {
+            padding-left: 20px;
+        }
+        .ios-guide li {
+            font-size: 8px;
+            color: #999;
+            margin-bottom: 6px;
+            line-height: 1.8;
+        }
+        .ios-guide a { color: #FF6B00; }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            padding: 18px 24px;
+            border: 4px solid #FF6B00;
+            background: #FF6B00;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 #000;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .btn-bot {
+            background: #2ea043;
+            border-color: #2ea043;
+            margin-top: 12px;
+        }
+
+        /* Turnstile */
+        .turnstile-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        /* Key box */
+        .sub-url-box {
+            background: #000;
+            border: 3px solid #0f0;
+            padding: 12px;
+            word-break: break-all;
+            font-size: 7px;
+            color: #0f0;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        .sub-url-box:hover::after {
+            content: 'НАЖМИ ЧТОБЫ СКОПИРОВАТЬ';
+            position: absolute;
+            top: -20px; right: 0;
+            font-size: 6px;
+            color: #FF6B00;
+        }
+        .copied-msg {
+            display: none;
+            text-align: center;
+            font-size: 8px;
+            color: #0f0;
+            margin-bottom: 8px;
+        }
+        .copied-msg.visible { display: block; }
+
+        /* Result */
+        #result { display: none; }
+        #result.visible { display: block; }
+
+        /* Error / loading */
+        .error-msg {
+            display: none;
+            background: #300;
+            border: 2px solid #f00;
+            padding: 12px;
+            font-size: 8px;
+            color: #f66;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .error-msg.visible { display: block; }
+        .loading { display: none; }
+        .loading.visible {
+            display: block;
+            text-align: center;
+            font-size: 9px;
+            color: #FF6B00;
+            margin: 16px 0;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* No code error */
+        .no-code {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .no-code p { font-size: 10px; margin-bottom: 20px; }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 8px;
+        }
+        .back-link a {
+            color: #555;
+            text-decoration: none;
+        }
+        .back-link a:hover { color: #FF6B00; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 16px; }
+            .btn { font-size: 9px; padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>КОМНАТЫ</h1>
+    <p class="subtitle">Приглашение в приватный VPN</p>
+
+    <!-- No code -->
+    <div class="no-code" id="noCode" style="display: none;">
+        <p>Инвайт-код не найден.</p>
+        <p>Попроси ссылку у друга, который уже в Комнатах.</p>
+        <a href="index.html" class="btn" style="display: inline-block; width: auto; padding: 14px 24px;">НА ГЛАВНУЮ</a>
+    </div>
+
+    <!-- Main flow -->
+    <div id="mainFlow">
+        <!-- Step 1: Download -->
+        <div class="panel" id="step1">
+            <div class="step-label">// ШАГ 1 — СКАЧАЙ КЛИЕНТ</div>
+            <p id="platformText">Определяем платформу...</p>
+            <div class="platform-links" id="platformLinks"></div>
+            <div class="ios-guide" id="iosGuide">
+                <h3>Смена региона App Store:</h3>
+                <ol>
+                    <li>Отмени подписки (iCloud+, Music и др.)</li>
+                    <li>Настройки > имя > Медиаматериалы и покупки > Просмотреть</li>
+                    <li>Страна/регион > Изменить > Казахстан</li>
+                    <li>Способ оплаты: Нет</li>
+                    <li>Адрес: Абая 1, Алматы, 050000, +7 700 000 0000</li>
+                    <li>Скачай <a href="https://apps.apple.com/app/hiddify-proxy-vpn/id6596777532">Hiddify</a> (или <a href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973">Happ</a> без смены региона)</li>
+                    <li>Потом можно вернуть регион — приложение останется</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 2: Get key -->
+        <div class="panel" id="step2">
+            <div class="step-label">// ШАГ 2 — ПОЛУЧИ VPN-КЛЮЧ</div>
+            <p style="margin-bottom: 12px;">7 дней бесплатного доступа по приглашению.</p>
+            <div class="turnstile-wrap">
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACxpoh1W_piaJTvH" data-theme="dark" data-callback="onTurnstileSuccess"></div>
+            </div>
+            <button class="btn" id="activateBtn" disabled>ПОЛУЧИТЬ КЛЮЧ</button>
+            <div class="loading" id="loading">ПОДКЛЮЧАЕМ...</div>
+            <div class="error-msg" id="errorMsg"></div>
+        </div>
+
+        <!-- Result -->
+        <div id="result">
+            <div class="panel">
+                <div class="step-label">// ТВОЙ VPN-КЛЮЧ</div>
+                <div class="sub-url-box" id="subUrl" onclick="copyKey()"></div>
+                <div class="copied-msg" id="copiedMsg">СКОПИРОВАНО!</div>
+                <p style="margin-top: 12px;">
+                    Открой приложение > + > Добавить из буфера > Включи
+                </p>
+            </div>
+
+            <div class="panel panel-green">
+                <div class="step-label">// ШАГ 3 — ЕСТЬ TELEGRAM?</div>
+                <p>Привяжи аккаунт и получи 30 дней бесплатно:</p>
+                <a id="botLink" href="#" class="btn btn-bot" style="margin-top: 12px;">ОТКРЫТЬ БОТ В TELEGRAM</a>
+                <p style="margin-top: 12px; font-size: 7px; color: #999;">
+                    В боте также есть бесплатный прокси для Telegram — без установки приложений!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="index.html">&lt; НА ГЛАВНУЮ</a>
+    </div>
+</div>
+
+<script>
+    var API_URL = 'https://komnaty.tech/api/web-invite';
+    var turnstileToken = null;
+
+    // Get invite code from URL: ?code=XXXX
+    var params = new URLSearchParams(window.location.search);
+    var CODE = params.get('code') || '';
+
+    if (!CODE || CODE.length < 10) {
+        document.getElementById('mainFlow').style.display = 'none';
+        document.getElementById('noCode').style.display = 'block';
+    }
+
+    // Platform detection
+    var ua = navigator.userAgent.toLowerCase();
+    var isIOS = /iphone|ipad|ipod/.test(ua);
+    var isAndroid = /android/.test(ua);
+    var isMac = /macintosh/.test(ua);
+    var isWindows = /windows/.test(ua);
+
+    var pt = document.getElementById('platformText');
+    var links = document.getElementById('platformLinks');
+
+    if (isIOS) {
+        pt.textContent = 'iPhone — Скачай Hiddify или Happ:';
+        links.innerHTML = '<a href="https://apps.apple.com/app/hiddify-proxy-vpn/id6596777532">App Store (Hiddify)</a> <a href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973">App Store (Happ)</a>';
+        document.getElementById('iosGuide').classList.add('visible');
+    } else if (isAndroid) {
+        pt.textContent = 'Android — Скачай Hiddify:';
+        links.innerHTML = '<a href="https://play.google.com/store/apps/details?id=app.hiddify.com">Google Play</a> <a href="https://github.com/hiddify/hiddify-app/releases/latest">APK</a>';
+    } else if (isWindows) {
+        pt.textContent = 'Windows — Скачай Hiddify:';
+        links.innerHTML = '<a href="https://github.com/hiddify/hiddify-app/releases/latest">Скачать</a>';
+    } else if (isMac) {
+        pt.textContent = 'macOS — Скачай Hiddify:';
+        links.innerHTML = '<a href="https://github.com/hiddify/hiddify-app/releases/latest">Скачать</a>';
+    } else {
+        pt.textContent = 'Скачай Hiddify:';
+        links.innerHTML = '<a href="https://github.com/hiddify/hiddify-app/releases/latest">Скачать</a>';
+    }
+
+    // Turnstile
+    function onTurnstileSuccess(token) {
+        turnstileToken = token;
+        document.getElementById('activateBtn').disabled = false;
+    }
+
+    // Activate
+    document.getElementById('activateBtn').addEventListener('click', function() {
+        var btn = this;
+        var loading = document.getElementById('loading');
+        var errorMsg = document.getElementById('errorMsg');
+
+        btn.disabled = true;
+        btn.style.display = 'none';
+        loading.classList.add('visible');
+        errorMsg.classList.remove('visible');
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: CODE, turnstile_token: turnstileToken })
+        })
+        .then(function(resp) {
+            if (!resp.ok) {
+                return resp.json().then(function(data) {
+                    throw new Error(data.detail || 'Request failed');
+                });
+            }
+            return resp.json();
+        })
+        .then(function(data) {
+            loading.classList.remove('visible');
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('subUrl').textContent = data.sub_url;
+            document.getElementById('botLink').href = data.bot_link;
+            document.getElementById('result').classList.add('visible');
+        })
+        .catch(function(err) {
+            loading.classList.remove('visible');
+            var msg = err.message || 'Ошибка соединения';
+            if (msg.indexOf('Invalid or exhausted') !== -1) {
+                msg = 'Инвайт-код недействителен или лимит приглашений исчерпан.';
+            } else if (msg.indexOf('Captcha') !== -1) {
+                msg = 'Ошибка проверки. Обнови страницу и попробуй снова.';
+            } else if (msg.indexOf('No available') !== -1) {
+                msg = 'Нет свободных комнат. Попробуй позже.';
+            }
+            document.getElementById('errorMsg').textContent = msg;
+            document.getElementById('errorMsg').classList.add('visible');
+            btn.style.display = 'block';
+            btn.disabled = false;
+        });
+    });
+
+    function copyKey() {
+        var url = document.getElementById('subUrl').textContent;
+        navigator.clipboard.writeText(url).then(function() {
+            var msg = document.getElementById('copiedMsg');
+            msg.classList.add('visible');
+            setTimeout(function() { msg.classList.remove('visible'); }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>

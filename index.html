@@ -680,7 +680,7 @@
                 </a>
             </div>
             <p style="margin-top: 16px; font-size: 8px;">
-                <a href="trial.html" target="_blank" rel="noopener"
+                <a href="trial.html"
                    style="color: #999; text-decoration: underline; transition: color 0.2s;"
                    onmouseover="this.style.color='#FF6B00'"
                    onmouseout="this.style.color='#999'">Нет доступа к Telegram?</a>
@@ -822,7 +822,7 @@
     (function() {
         const overlay = document.getElementById('modalOverlay');
         const input = document.getElementById('inviteInput');
-        const INVITE_BASE = 'https://komnaty-invite.pavlikse.workers.dev/';
+        const INVITE_BASE = 'invite.html?code=';
 
         document.getElementById('inviteBtn').addEventListener('click', function(e) {
             e.preventDefault();
@@ -847,7 +847,7 @@
         function go() {
             var code = input.value.trim();
             if (code) {
-                window.open(INVITE_BASE + encodeURIComponent(code), '_blank');
+                window.location.href = INVITE_BASE + encodeURIComponent(code);
                 overlay.classList.remove('active');
             }
         }
