@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комнаты — Экстренный доступ</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #111;
+            color: #e0e0e0;
+            image-rendering: pixelated;
+            line-height: 2;
+            min-height: 100vh;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 20px;
+            color: #FF6B00;
+            text-align: center;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 8px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .panel {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+        .panel h2 {
+            font-size: 12px;
+            color: #FF6B00;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        .step-label {
+            font-size: 10px;
+            color: #FF6B00;
+            margin-bottom: 12px;
+        }
+        p, li {
+            font-size: 9px;
+            line-height: 2.2;
+            color: #ccc;
+        }
+
+        /* Platform buttons */
+        .platforms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .plat-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 14px 8px;
+            border: 3px solid #333;
+            background: #1a1a1a;
+            color: #ccc;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .plat-btn:hover { border-color: #FF6B00; color: #FF6B00; }
+        .plat-btn.active {
+            border-color: #FF6B00;
+            background: #FF6B00;
+            color: #000;
+        }
+        .download-link {
+            display: none;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .download-link.visible { display: block; }
+        .download-link a {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #0f0;
+            text-decoration: underline;
+        }
+
+        /* Main action button */
+        .btn {
+            display: block;
+            width: 100%;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            padding: 18px 24px;
+            border: 4px solid #FF6B00;
+            background: #FF6B00;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 #000;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .btn-bot {
+            background: #1a1a1a;
+            color: #FF6B00;
+            margin-top: 12px;
+        }
+
+        /* Turnstile */
+        .turnstile-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        /* Result section */
+        #result { display: none; }
+        #result.visible { display: block; }
+
+        .sub-url-box {
+            background: #000;
+            border: 3px solid #0f0;
+            padding: 12px;
+            word-break: break-all;
+            font-size: 7px;
+            color: #0f0;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        .sub-url-box:hover::after {
+            content: 'НАЖМИ ЧТОБЫ СКОПИРОВАТЬ';
+            position: absolute;
+            top: -20px; right: 0;
+            font-size: 6px;
+            color: #FF6B00;
+        }
+        .copied-msg {
+            display: none;
+            text-align: center;
+            font-size: 8px;
+            color: #0f0;
+            margin-bottom: 8px;
+        }
+        .copied-msg.visible { display: block; }
+
+        #qrcode {
+            text-align: center;
+            margin: 16px 0;
+            background: #fff;
+            padding: 12px;
+            display: inline-block;
+        }
+        .qr-wrap { text-align: center; }
+
+        /* Instructions */
+        .instructions {
+            margin-top: 16px;
+        }
+        .instructions ol {
+            list-style: none;
+            counter-reset: steps;
+        }
+        .instructions li {
+            counter-increment: steps;
+            margin-bottom: 8px;
+        }
+        .instructions li::before {
+            content: counter(steps) ". ";
+            color: #FF6B00;
+        }
+
+        /* CTA block */
+        .cta-block {
+            background: #1a1a1a;
+            border: 4px solid #FF6B00;
+            padding: 20px;
+            text-align: center;
+            margin-top: 24px;
+            position: relative;
+        }
+        .cta-block::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: -1;
+        }
+        .cta-block .warning {
+            font-size: 10px;
+            color: #FF6B00;
+            margin-bottom: 12px;
+        }
+        .cta-block p {
+            margin-bottom: 8px;
+        }
+        .cta-block .proxy-hint {
+            font-size: 7px;
+            color: #999;
+            margin-top: 12px;
+        }
+
+        /* Error */
+        .error-msg {
+            display: none;
+            background: #300;
+            border: 2px solid #f00;
+            padding: 12px;
+            font-size: 8px;
+            color: #f66;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .error-msg.visible { display: block; }
+
+        /* Loading */
+        .loading { display: none; }
+        .loading.visible {
+            display: block;
+            text-align: center;
+            font-size: 9px;
+            color: #FF6B00;
+            margin: 16px 0;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Back link */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 8px;
+        }
+        .back-link a {
+            color: #555;
+            text-decoration: none;
+        }
+        .back-link a:hover { color: #FF6B00; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 16px; }
+            .platforms { grid-template-columns: 1fr; }
+            .btn { font-size: 9px; padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ЭКСТРЕННЫЙ ДОСТУП</h1>
+    <p class="subtitle">Бесплатный VPN на 24 часа для доступа к Telegram</p>
+
+    <!-- Step 1: Platform -->
+    <div class="panel" id="step1">
+        <div class="step-label">// ШАГ 1 — СКАЧАЙ КЛИЕНТ</div>
+        <p style="margin-bottom: 12px;">Выбери свою платформу:</p>
+        <div class="platforms">
+            <button class="plat-btn" data-platform="android">ANDROID</button>
+            <button class="plat-btn" data-platform="windows">WINDOWS</button>
+            <button class="plat-btn" data-platform="ios">iPHONE</button>
+            <button class="plat-btn" data-platform="macos">MacOS</button>
+        </div>
+        <div class="download-link" id="downloadLink"></div>
+    </div>
+
+    <!-- Step 2: Get trial -->
+    <div class="panel" id="step2">
+        <div class="step-label">// ШАГ 2 — ПОЛУЧИ VPN</div>
+        <p style="margin-bottom: 12px;">Пройди проверку и получи доступ на 24 часа:</p>
+        <div class="turnstile-wrap">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAACxpoh1W_piaJTvH" data-theme="dark" data-callback="onTurnstileSuccess"></div>
+        </div>
+        <button class="btn" id="getTrialBtn" disabled>ПОЛУЧИТЬ VPN НА 24 ЧАСА</button>
+        <div class="loading" id="loading">ПОДКЛЮЧАЕМ...</div>
+        <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="result">
+        <div class="panel">
+            <div class="step-label">// ШАГ 3 — ПОДКЛЮЧИСЬ</div>
+            <p style="margin-bottom: 12px;">Твоя ссылка на подписку:</p>
+            <div class="sub-url-box" id="subUrl" onclick="copyUrl()"></div>
+            <div class="copied-msg" id="copiedMsg">СКОПИРОВАНО!</div>
+            <div class="qr-wrap">
+                <div id="qrcode"></div>
+            </div>
+            <div class="instructions" id="instructions"></div>
+        </div>
+
+        <div class="cta-block">
+            <div class="warning">Это временный доступ на 24 часа</div>
+            <p>Для полного VPN без ограничений — подключись через нашего Telegram-бота:</p>
+            <a href="https://t.me/KomnatyBot" target="_blank" rel="noopener" class="btn btn-bot">TELEGRAM BOT</a>
+            <p class="proxy-hint">В боте также есть бесплатный прокси для Telegram — без установки приложений!</p>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="index.html">&lt; ВЕРНУТЬСЯ НА ГЛАВНУЮ</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    var API_URL = 'https://komnaty.tech/v1/trial';
+    var turnstileToken = null;
+    var selectedPlatform = null;
+
+    // Platform data
+    var platforms = {
+        android: {
+            name: 'Hiddify',
+            url: 'https://github.com/hiddify/hiddify-app/releases/latest',
+            instructions: [
+                'Открой Hiddify',
+                'Нажми + (добавить профиль)',
+                'Выбери "Добавить из буфера обмена" или вставь ссылку',
+                'Нажми на кнопку подключения'
+            ]
+        },
+        windows: {
+            name: 'Hiddify',
+            url: 'https://github.com/hiddify/hiddify-app/releases/latest',
+            instructions: [
+                'Открой Hiddify',
+                'Нажми + (добавить профиль)',
+                'Выбери "Добавить из буфера обмена" или вставь ссылку',
+                'Нажми на кнопку подключения'
+            ]
+        },
+        ios: {
+            name: 'Happ',
+            url: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
+            instructions: [
+                'Открой Happ',
+                'Нажми + (добавить подписку)',
+                'Вставь скопированную ссылку',
+                'Нажми подключиться'
+            ]
+        },
+        macos: {
+            name: 'Hiddify',
+            url: 'https://github.com/hiddify/hiddify-app/releases/latest',
+            instructions: [
+                'Открой Hiddify',
+                'Нажми + (добавить профиль)',
+                'Выбери "Добавить из буфера обмена" или вставь ссылку',
+                'Нажми на кнопку подключения'
+            ]
+        }
+    };
+
+    // Platform selection
+    document.querySelectorAll('.plat-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.plat-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            selectedPlatform = btn.dataset.platform;
+
+            var p = platforms[selectedPlatform];
+            var dl = document.getElementById('downloadLink');
+            dl.innerHTML = '<a href="' + p.url + '" target="_blank" rel="noopener">Скачать ' + p.name + ' &rarr;</a>';
+            dl.classList.add('visible');
+
+            updateBtn();
+        });
+    });
+
+    // Turnstile callback
+    function onTurnstileSuccess(token) {
+        turnstileToken = token;
+        updateBtn();
+    }
+
+    function updateBtn() {
+        document.getElementById('getTrialBtn').disabled = !(turnstileToken && selectedPlatform);
+    }
+
+    // Get trial
+    document.getElementById('getTrialBtn').addEventListener('click', function() {
+        var btn = this;
+        var loading = document.getElementById('loading');
+        var errorMsg = document.getElementById('errorMsg');
+
+        btn.disabled = true;
+        loading.classList.add('visible');
+        errorMsg.classList.remove('visible');
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ turnstile_token: turnstileToken })
+        })
+        .then(function(resp) {
+            if (!resp.ok) {
+                return resp.json().then(function(data) {
+                    throw new Error(data.detail || 'Ошибка сервера');
+                });
+            }
+            return resp.json();
+        })
+        .then(function(data) {
+            loading.classList.remove('visible');
+            if (data.ok && data.sub_url) {
+                showResult(data.sub_url);
+            } else {
+                showError('Неожиданный ответ сервера');
+            }
+        })
+        .catch(function(err) {
+            loading.classList.remove('visible');
+            var msg = err.message || 'Ошибка соединения';
+            if (msg.indexOf('already used') !== -1) {
+                msg = 'С этого IP уже был получен триал. Повторный доступ — через 30 дней.';
+            } else if (msg.indexOf('Too many') !== -1) {
+                msg = 'Слишком много активных триалов. Попробуй позже.';
+            } else if (msg.indexOf('Captcha') !== -1) {
+                msg = 'Ошибка проверки. Обнови страницу и попробуй снова.';
+            }
+            showError(msg);
+            btn.disabled = false;
+        });
+    });
+
+    function showError(msg) {
+        var el = document.getElementById('errorMsg');
+        el.textContent = msg;
+        el.classList.add('visible');
+    }
+
+    function showResult(subUrl) {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
+
+        var resultEl = document.getElementById('result');
+        resultEl.classList.add('visible');
+
+        document.getElementById('subUrl').textContent = subUrl;
+
+        // QR code
+        var qrEl = document.getElementById('qrcode');
+        qrEl.innerHTML = '';
+        new QRCode(qrEl, {
+            text: subUrl,
+            width: 180,
+            height: 180,
+            colorDark: '#000',
+            colorLight: '#fff',
+        });
+
+        // Instructions based on platform
+        var p = platforms[selectedPlatform];
+        var instrEl = document.getElementById('instructions');
+        var html = '<ol>';
+        p.instructions.forEach(function(step) {
+            html += '<li>' + step + '</li>';
+        });
+        html += '</ol>';
+        instrEl.innerHTML = html;
+    }
+
+    function copyUrl() {
+        var url = document.getElementById('subUrl').textContent;
+        navigator.clipboard.writeText(url).then(function() {
+            var msg = document.getElementById('copiedMsg');
+            msg.classList.add('visible');
+            setTimeout(function() { msg.classList.remove('visible'); }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
