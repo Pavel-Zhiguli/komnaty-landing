@@ -421,7 +421,7 @@
     }
 
     function updateBtn() {
-        document.getElementById('getTrialBtn').disabled = !(turnstileToken && selectedPlatform);
+        document.getElementById('getTrialBtn').disabled = !turnstileToken;
     }
 
     // Get trial
@@ -497,7 +497,7 @@
         });
 
         // Instructions based on platform
-        var p = platforms[selectedPlatform];
+        var p = platforms[selectedPlatform] || platforms.android;
         var instrEl = document.getElementById('instructions');
         var html = '<ol>';
         p.instructions.forEach(function(step) {
